@@ -20,19 +20,25 @@ const products = productsFromServer.map((product) => {
 });
 
 export const App = () => {
+  const [query, setQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState('All');
-  const [visibleProducts, setVisibleProducts] = useState(products);
+
+  const filteredProducts = products.filter((product) => {
+    const formattedQuery = query.toLowerCase();
+    const formattedName = product.name.toLowerCase();
+
+    return formattedName.includes(formattedQuery)
+      && (product.user.id === selectedUser || selectedUser === 'All');
+  });
+
+  const [visibleProducts, setVisibleProducts] = useState(filteredProducts);
   const handleUserSelect = (userId) => {
     setSelectedUser(userId);
   };
 
   useEffect(() => {
-    const filteredProducts = products.filter(product => (
-      product.user.id === selectedUser || selectedUser === 'All'
-    ));
-
     setVisibleProducts(filteredProducts);
-  }, [selectedUser]);
+  }, [selectedUser, query]);
 
   return (
     <div className="section">
@@ -75,8 +81,8 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
-                  onChange={() => {}}
+                  value={query}
+                  onChange={event => setQuery(event.target.value)}
                 />
 
                 <span className="icon is-left">
